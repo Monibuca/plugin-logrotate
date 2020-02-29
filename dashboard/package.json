@@ -1,0 +1,16 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "vue-cli-service build --dest ui --target wc --name plugin-logrotate index.vue"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@vue/cli-service": "^4.2.3",
+    "view-design": "^4.1.3",
+    "vue-template-compiler": "^2.6.11"
+  }
+}
