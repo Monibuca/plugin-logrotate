@@ -722,12 +722,12 @@ function normalizeComponent (
   }
 }
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"5eb56a5e-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=5f7c74f1&shadow
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"5eb56a5e-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=2856288c&shadow
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('Tabs',{attrs:{"type":"card"}},[_c('TabPane',{staticClass:"tabpanel",attrs:{"label":"日志文件"}},[_c('List',_vm._l((_vm.logFiles),function(item){return _c('ListItem',{key:item.Name},[_c('ListItemMeta',{attrs:{"title":item.Name,"description":_vm.networkFormat(item.Size)}}),_c('template',{slot:"action"},[_c('li',[_c('a',{attrs:{"href":'/logrotate/download?file='+item.Name,"target":"_blank"}},[_vm._v("下载")])])])],2)}),1)],1),_c('TabPane',{staticClass:"tabpanel",attrs:{"label":"日志跟踪"}},[_c('div',[_vm._v(" 自动滚动 "),_c('i-switch',{model:{value:(_vm.autoScroll),callback:function ($$v) {_vm.autoScroll=$$v},expression:"autoScroll"}})],1),_c('div',{ref:"logContainer",staticClass:"log-container"},[_c('pre',[_vm._l((_vm.logs),function(item){return [_vm._v(_vm._s(item+"\n"))]})],2)])]),_c('TabPane',{staticClass:"tabpanel",attrs:{"label":"日志查询"}},[_c('i-input',{attrs:{"search":""},on:{"on-search":_vm.onSearch}}),_c('pre',[_vm._v(_vm._s(_vm.result))])],1)],1)}
 var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./index.vue?vue&type=template&id=5f7c74f1&shadow
+// CONCATENATED MODULE: ./index.vue?vue&type=template&id=2856288c&shadow
 
 // CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=script&lang=js&shadow
 //
@@ -762,6 +762,13 @@ var staticRenderFns = []
 //
 
 let logsES = null;
+const uintInc = {
+    "": "K",
+    K: "M",
+    M: "G",
+    G: null
+};
+
 /* harmony default export */ var lib_vue_loader_options_indexvue_type_script_lang_js_shadow = ({
     data() {
         return {

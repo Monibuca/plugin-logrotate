@@ -30,6 +30,13 @@
 
 <script>
 let logsES = null;
+const uintInc = {
+    "": "K",
+    K: "M",
+    M: "G",
+    G: null
+};
+
 export default {
     data() {
         return {
