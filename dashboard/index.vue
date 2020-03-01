@@ -4,6 +4,11 @@
             <List>
                 <ListItem v-for="item in logFiles" :key="item.Name">
                     <ListItemMeta :title="item.Name" :description="networkFormat(item.Size)"></ListItemMeta>
+                    <template slot="action">
+                        <li>
+                            <a :href="'/logrotate/download?file='+item.Name" target="_blank">下载</a>
+                        </li>
+                    </template>
                 </ListItem>
             </List>
         </TabPane>
