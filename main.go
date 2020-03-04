@@ -36,13 +36,12 @@ type LogRotate struct {
 }
 
 func init() {
-	_, currentFilePath, _, _ := runtime.Caller(0)
 	InstallPlugin(&PluginConfig{
 		Name:    "LogRotate",
 		Type:    PLUGIN_HOOK,
 		Config:  config,
 		Version: "1.0.0",
-		UI:      path.Join(path.Dir(currentFilePath), "dashboard", "ui", "plugin-logrotate.min.js"),
+		UI:      CurrentDir("dashboard", "ui", "plugin-logrotate.min.js"),
 		Run:     run,
 	})
 }
