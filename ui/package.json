@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "vue-cli-service build --dest ui --target wc --name plugin-logrotate index.vue"
+    "build": "vue-cli-service build --dest dist --target wc --name plugin-logrotate index.vue"
   },
   "author": "",
   "license": "ISC",

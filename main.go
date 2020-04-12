@@ -1,4 +1,4 @@
-package logrotateplugin
+package logrotate
 
 import (
 	"bytes"
@@ -37,18 +37,17 @@ type LogRotate struct {
 
 func init() {
 	InstallPlugin(&PluginConfig{
-		Name:    "LogRotate",
-		Type:    PLUGIN_HOOK,
-		Config:  config,
-		Version: "1.0.0",
-		UI:      CurrentDir("dashboard", "ui", "plugin-logrotate.min.js"),
-		Run:     run,
+		Name:   "LogRotate",
+		Type:   PLUGIN_HOOK,
+		Config: config,
+		Run:    run,
 	})
 }
 func run() {
 	http.HandleFunc("/logrotate/tail", watchLogs)
 	http.HandleFunc("/logrotate/find", findLog)
 	http.HandleFunc("/logrotate/list", listLogFiles)
+	http.HandleFunc("/logrotate/open", openLog)
 	http.HandleFunc("/logrotate/download", download)
 	if config.Size > 0 {
 		config.splitFunc = config.splitBySize
@@ -143,6 +142,22 @@ func download(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	w.Header().Add("Content-Disposition", "attachment; filename="+filename)
+	if err != nil {
+		return
+	}
+	_, err = io.Copy(w, file)
+	if err != nil {
+		return
+	}
+}
+func openLog(w http.ResponseWriter, r *http.Request) {
+	filename := r.URL.Query().Get("file")
+	file, err := os.Open(filename)
+	defer func() {
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		}
+	}()
 	if err != nil {
 		return
 	}
