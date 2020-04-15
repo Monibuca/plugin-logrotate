@@ -1,20 +1,18 @@
 <template>
-    <mu-container>
-        <mu-tabs
-            :value.sync="active1"
-            inverse
-            center
-        >
+    <div>
+        <mu-tabs :value.sync="active1" indicator-color="#80deea" inverse center>
             <mu-tab>日志文件</mu-tab>
             <mu-tab>日志跟踪</mu-tab>
             <mu-tab>日志查询</mu-tab>
         </mu-tabs>
-        <div class="tabpanel" style="display:flex" v-if="active1 === 0">
+        <div class="tabpanel tab1" v-if="active1 === 0">
             <mu-card v-for="item in logFiles" :key="item.Name">
                 <mu-card-title :title="item.Name" :sub-title="unitFormat(item.Size)"></mu-card-title>
                 <mu-card-actions>
-                    <mu-button flat :href="'/logrotate/open?file='+item.Name" target="_blank">打开</mu-button>
-                    <mu-button flat :href="'/logrotate/download?file='+item.Name" target="_blank">下载</mu-button>
+                    <mu-button small flat :href="apiHost+'/logrotate/open?file='+item.Name" target="_blank">打开
+                    </mu-button>
+                    <mu-button small flat :href="apiHost+'/logrotate/download?file='+item.Name" target="_blank">下载
+                    </mu-button>
                 </mu-card-actions>
             </mu-card>
         </div>
@@ -27,15 +25,14 @@
             </div>
         </div>
         <div class="tabpanel" v-if="active1 === 2">
-            <mu-text-field @change="onSearch"></mu-text-field>
+            <mu-text-field @change="onSearch" placeholder="输入查询关键词"></mu-text-field>
             <pre>{{result}}</pre>
         </div>
-    </mu-container>
+    </div>
 </template>
 
 <script>
 let logsES = null;
-
 
 export default {
     data() {
@@ -48,25 +45,27 @@ export default {
         };
     },
     mounted() {
-        logsES = new EventSource("/logrotate/tail");
+        logsES = new EventSource(this.apiHost + "/logrotate/tail");
         logsES.onmessage = evt => {
             if (!evt.data) return;
             this.logs.push(evt.data);
         };
-        window.ajax.getJSON("/logrotate/list").then(x => (this.logFiles = x));
+        this.ajax
+            .getJSON(this.apiHost + "/logrotate/list")
+            .then(x => (this.logFiles = x));
     },
-    deactivated() {
+    destroyed() {
         logsES.close();
     },
     methods: {
         onSearch(value) {
-            window.ajax
-                .get("/logrotate/find?query=" + value)
+            this.ajax
+                .get(this.apiHost + "/logrotate/find?query=" + value)
                 .then(x => (this.result = x));
         }
     },
     updated() {
-        if (this.autoScroll) {
+        if (this.autoScroll && this.$refs.logContainer) {
             this.$refs.logContainer.scrollTop = this.$refs.logContainer.offsetHeight;
         }
     }
@@ -80,5 +79,17 @@ export default {
 }
 .tabpanel {
     padding: 0 20px;
+}
+.tab1 {
+    display: flex;
+    flex-wrap: wrap;
+}
+.tabpanel .mu-card {
+    margin: 5px;
+    width: 200px;
+}
+.tabpanel .mu-card .mu-card-title-container .mu-card-title {
+    font-size: 14px;
+    line-height: unset;
 }
 </style>

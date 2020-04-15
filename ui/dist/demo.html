@@ -1,8 +1,19 @@
 <meta charset="utf-8">
 <title>plugin-logrotate demo</title>
 <script src="https://unpkg.com/vue"></script>
-<script src="./plugin-logrotate.js"></script>
+<script src="./plugin-logrotate.umd.js"></script>
+
+<link rel="stylesheet" href="./plugin-logrotate.css">
 
 
-<plugin-logrotate></plugin-logrotate>
+<div id="app">
+  <demo></demo>
+</div>
 
+<script>
+new Vue({
+  components: {
+    demo: plugin-logrotate
+  }
+}).$mount('#app')
+</script>

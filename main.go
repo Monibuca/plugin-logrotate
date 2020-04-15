@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"runtime"
 	"time"
 
@@ -65,7 +65,7 @@ func run() {
 		config.formatter = "2006-01-02T15:04:05"
 	}
 	err := os.MkdirAll(config.Path, 0666)
-	config.file, err = os.OpenFile(path.Join(config.Path, fmt.Sprintf("%s.log", config.createTime.Format(config.formatter))), os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0666)
+	config.file, err = os.OpenFile(filepath.Join(config.Path, fmt.Sprintf("%s.log", config.createTime.Format(config.formatter))), os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0666)
 	if err == nil {
 		stat, _ := config.file.Stat()
 		config.currentSize = stat.Size()
@@ -86,7 +86,7 @@ func (l *LogRotate) Write(data []byte) (n int, err error) {
 	if err == nil {
 		if l.splitFunc() {
 			l.createTime = time.Now()
-			if file, err := os.OpenFile(path.Join(l.Path, fmt.Sprintf("%s.log", l.createTime.Format(config.formatter))), os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0666); err == nil {
+			if file, err := os.OpenFile(filepath.Join(l.Path, fmt.Sprintf("%s.log", l.createTime.Format(config.formatter))), os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0666); err == nil {
 				l.file = file
 				l.currentSize = 0
 			}
@@ -106,6 +106,7 @@ func findLog(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(out.String()))
 }
 func listLogFiles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	dir, err := os.Open(config.Path)
 	defer func() {
 		if err != nil {
@@ -135,7 +136,7 @@ func listLogFiles(w http.ResponseWriter, r *http.Request) {
 }
 func download(w http.ResponseWriter, r *http.Request) {
 	filename := r.URL.Query().Get("file")
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Join(config.Path, filename))
 	defer func() {
 		if err != nil {
 			w.Write([]byte(err.Error()))
@@ -152,7 +153,7 @@ func download(w http.ResponseWriter, r *http.Request) {
 }
 func openLog(w http.ResponseWriter, r *http.Request) {
 	filename := r.URL.Query().Get("file")
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Join(config.Path, filename))
 	defer func() {
 		if err != nil {
 			w.Write([]byte(err.Error()))
