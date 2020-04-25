@@ -1,10 +1,6 @@
 <template>
     <div>
-        <mu-tabs :value.sync="active1" indicator-color="#80deea" inverse center>
-            <mu-tab>日志文件</mu-tab>
-            <mu-tab>日志跟踪</mu-tab>
-            <mu-tab>日志查询</mu-tab>
-        </mu-tabs>
+        
         <div class="tabpanel tab1" v-if="active1 === 0">
             <mu-card v-for="item in logFiles" :key="item.Name">
                 <mu-card-title :title="item.Name" :sub-title="unitFormat(item.Size)"></mu-card-title>
@@ -53,6 +49,25 @@ export default {
         this.ajax
             .getJSON(this.apiHost + "/logrotate/list")
             .then(x => (this.logFiles = x));
+        const _this = this
+        this.$parent.pluginAppbar = {
+            data() {
+                return {
+                    active1: 0
+                };
+            },
+            watch: {
+                active1(v) {
+                    _this.active1 = v;
+                }
+            },
+            template: `
+            <mu-tabs :value.sync="active1" indicator-color="#80deea" inverse center>
+            <mu-tab>日志文件</mu-tab>
+            <mu-tab>日志跟踪</mu-tab>
+            <mu-tab>日志查询</mu-tab>
+        </mu-tabs>`
+        };
     },
     destroyed() {
         logsES.close();
