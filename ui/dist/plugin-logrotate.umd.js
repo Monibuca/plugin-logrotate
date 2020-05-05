@@ -180,14 +180,18 @@ if (typeof window !== 'undefined') {
 // Indicate to webpack that this file can be concatenated
 /* harmony default export */ var setPublicPath = (null);
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"5eb56a5e-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/App.vue?vue&type=template&id=1ff41d56&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',[(_vm.active1 === 0)?_c('div',{staticClass:"tabpanel tab1"},_vm._l((_vm.logFiles),function(item){return _c('mu-card',{key:item.Name},[_c('mu-card-title',{attrs:{"title":item.Name,"sub-title":_vm.unitFormat(item.Size)}}),_c('mu-card-actions',[_c('mu-button',{attrs:{"small":"","flat":"","href":_vm.apiHost+'/logrotate/open?file='+item.Name,"target":"_blank"}},[_vm._v("打开 ")]),_c('mu-button',{attrs:{"small":"","flat":"","href":_vm.apiHost+'/logrotate/download?file='+item.Name,"target":"_blank"}},[_vm._v("下载 ")])],1)],1)}),1):_vm._e(),(_vm.active1 === 1)?_c('div',{staticClass:"tabpanel"},[_c('div',[_c('mu-switch',{attrs:{"label":"自动滚动"},model:{value:(_vm.autoScroll),callback:function ($$v) {_vm.autoScroll=$$v},expression:"autoScroll"}})],1),_c('div',{ref:"logContainer",staticClass:"log-container"},[_c('pre',[_vm._l((_vm.logs),function(item){return [_vm._v(_vm._s(item+"\n"))]})],2)])]):_vm._e(),(_vm.active1 === 2)?_c('div',{staticClass:"tabpanel"},[_c('mu-text-field',{attrs:{"placeholder":"输入查询关键词"},on:{"change":_vm.onSearch}}),_c('pre',[_vm._v(_vm._s(_vm.result))])],1):_vm._e()])}
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"5eb56a5e-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/App.vue?vue&type=template&id=24723aba&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',[(_vm.$parent.titleTabActive === 0)?_c('div',{staticClass:"tabpanel"},[_c('mu-data-table',{attrs:{"columns":_vm.logClumns,"data":_vm.logFiles.slice((_vm.currentLogPage-1)*10,_vm.currentLogPage*10)},scopedSlots:_vm._u([{key:"expand",fn:function(prop){return _c('div',{},[_c('m-button',{attrs:{"href":_vm.apiHost+'/logrotate/open?file='+prop.row.Name}},[_vm._v("打开")]),_c('m-button',{attrs:{"href":_vm.apiHost+'/logrotate/download?file='+prop.row.Name}},[_vm._v("下载")])],1)}}],null,false,438113782)},[_c('mu-pagination',{attrs:{"slot":"footer","total":_vm.logFiles.length,"current":_vm.currentLogPage},on:{"update:current":function($event){_vm.currentLogPage=$event}},slot:"footer"})],1)],1):_vm._e(),(_vm.$parent.titleTabActive === 1)?_c('div',{staticClass:"tabpanel"},[_c('div',[_c('mu-switch',{attrs:{"label":"自动滚动"},model:{value:(_vm.autoScroll),callback:function ($$v) {_vm.autoScroll=$$v},expression:"autoScroll"}})],1),_c('div',{ref:"logContainer",staticClass:"log-container"},[_c('pre',[_vm._l((_vm.logs),function(item){return [_vm._v(_vm._s(item+"\n"))]})],2)])]):_vm._e(),(_vm.$parent.titleTabActive === 2)?_c('div',{staticClass:"tabpanel"},[_c('mu-text-field',{attrs:{"placeholder":"输入查询关键词"},on:{"change":_vm.onSearch}}),_c('pre',[_vm._v(_vm._s(_vm.result))])],1):_vm._e()])}
 var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/App.vue?vue&type=template&id=1ff41d56&
+// CONCATENATED MODULE: ./src/App.vue?vue&type=template&id=24723aba&
 
 // CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/App.vue?vue&type=script&lang=js&
+//
+//
+//
+//
 //
 //
 //
@@ -223,7 +227,21 @@ let logsES = null;
 /* harmony default export */ var Appvue_type_script_lang_js_ = ({
     data() {
         return {
+            logClumns:[
+                {
+                    title:"名称",
+                    name:"Name"
+                },
+                {
+                    title:"尺寸",
+                    name:"Size",
+                    formatter:v=>{
+                        return this.unitFormat(v)
+                    }
+                }
+            ],
             autoScroll: true,
+            currentLogPage:1,
             logs: [],
             logFiles: [],
             result: "",
@@ -239,25 +257,7 @@ let logsES = null;
         this.ajax
             .getJSON(this.apiHost + "/logrotate/list")
             .then(x => (this.logFiles = x));
-        const _this = this
-        this.$parent.pluginAppbar = {
-            data() {
-                return {
-                    active1: 0
-                };
-            },
-            watch: {
-                active1(v) {
-                    _this.active1 = v;
-                }
-            },
-            template: `
-            <mu-tabs :value.sync="active1" indicator-color="#80deea" inverse center>
-            <mu-tab>日志文件</mu-tab>
-            <mu-tab>日志跟踪</mu-tab>
-            <mu-tab>日志查询</mu-tab>
-        </mu-tabs>`
-        };
+        this.$parent.titleTabs=["日志文件","日志跟踪","日志查询"]
     },
     destroyed() {
         logsES.close();

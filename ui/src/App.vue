@@ -1,18 +1,22 @@
 <template>
     <div>
-        
-        <div class="tabpanel tab1" v-if="active1 === 0">
-            <mu-card v-for="item in logFiles" :key="item.Name">
-                <mu-card-title :title="item.Name" :sub-title="unitFormat(item.Size)"></mu-card-title>
-                <mu-card-actions>
-                    <mu-button small flat :href="apiHost+'/logrotate/open?file='+item.Name" target="_blank">打开
-                    </mu-button>
-                    <mu-button small flat :href="apiHost+'/logrotate/download?file='+item.Name" target="_blank">下载
-                    </mu-button>
-                </mu-card-actions>
-            </mu-card>
+        <div class="tabpanel" v-if="$parent.titleTabActive === 0">
+            <mu-data-table
+                :columns="logClumns"
+                :data="logFiles.slice((currentLogPage-1)*10,currentLogPage*10)"
+            >
+            <div slot="expand" slot-scope="prop">
+                <m-button :href="apiHost+'/logrotate/open?file='+prop.row.Name">打开</m-button>
+                <m-button :href="apiHost+'/logrotate/download?file='+prop.row.Name">下载</m-button>
+            </div>
+                <mu-pagination
+                    slot="footer"
+                    :total="logFiles.length"
+                    :current.sync="currentLogPage"
+                ></mu-pagination>
+            </mu-data-table>
         </div>
-        <div class="tabpanel" v-if="active1 === 1">
+        <div class="tabpanel" v-if="$parent.titleTabActive === 1">
             <div>
                 <mu-switch v-model="autoScroll" label="自动滚动" />
             </div>
@@ -20,7 +24,7 @@
                 <pre><template v-for="item in logs">{{item+"\n"}}</template></pre>
             </div>
         </div>
-        <div class="tabpanel" v-if="active1 === 2">
+        <div class="tabpanel" v-if="$parent.titleTabActive === 2">
             <mu-text-field @change="onSearch" placeholder="输入查询关键词"></mu-text-field>
             <pre>{{result}}</pre>
         </div>
@@ -33,7 +37,21 @@ let logsES = null;
 export default {
     data() {
         return {
+            logClumns:[
+                {
+                    title:"名称",
+                    name:"Name"
+                },
+                {
+                    title:"尺寸",
+                    name:"Size",
+                    formatter:v=>{
+                        return this.unitFormat(v)
+                    }
+                }
+            ],
             autoScroll: true,
+            currentLogPage:1,
             logs: [],
             logFiles: [],
             result: "",
@@ -49,25 +67,7 @@ export default {
         this.ajax
             .getJSON(this.apiHost + "/logrotate/list")
             .then(x => (this.logFiles = x));
-        const _this = this
-        this.$parent.pluginAppbar = {
-            data() {
-                return {
-                    active1: 0
-                };
-            },
-            watch: {
-                active1(v) {
-                    _this.active1 = v;
-                }
-            },
-            template: `
-            <mu-tabs :value.sync="active1" indicator-color="#80deea" inverse center>
-            <mu-tab>日志文件</mu-tab>
-            <mu-tab>日志跟踪</mu-tab>
-            <mu-tab>日志查询</mu-tab>
-        </mu-tabs>`
-        };
+        this.$parent.titleTabs=["日志文件","日志跟踪","日志查询"]
     },
     destroyed() {
         logsES.close();
@@ -95,10 +95,7 @@ export default {
 .tabpanel {
     padding: 0 20px;
 }
-.tab1 {
-    display: flex;
-    flex-wrap: wrap;
-}
+
 .tabpanel .mu-card {
     margin: 5px;
     width: 200px;
