@@ -13,11 +13,11 @@ import (
 	"runtime"
 	"time"
 
-	. "github.com/Monibuca/engine/v2"
-	. "github.com/Monibuca/engine/v2/util"
+	. "github.com/Monibuca/engine/v3"
+	. "github.com/Monibuca/utils/v3"
 )
 
-var config = new(LogRotate)
+var config LogRotate
 
 type FileInfo struct {
 	Name string
@@ -38,8 +38,7 @@ type LogRotate struct {
 func init() {
 	InstallPlugin(&PluginConfig{
 		Name:   "LogRotate",
-		Type:   PLUGIN_HOOK,
-		Config: config,
+		Config: &config,
 		Run:    run,
 	})
 }
@@ -69,7 +68,7 @@ func run() {
 	if err == nil {
 		stat, _ := config.file.Stat()
 		config.currentSize = stat.Size()
-		AddWriter(config)
+		AddWriter(&config)
 	} else {
 		log.Println(err)
 	}
