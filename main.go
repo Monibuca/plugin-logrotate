@@ -43,11 +43,11 @@ func init() {
 	})
 }
 func run() {
-	http.HandleFunc("/logrotate/tail", watchLogs)
-	http.HandleFunc("/logrotate/find", findLog)
-	http.HandleFunc("/logrotate/list", listLogFiles)
-	http.HandleFunc("/logrotate/open", openLog)
-	http.HandleFunc("/logrotate/download", download)
+	http.HandleFunc("/api/logrotate/tail", watchLogs)
+	http.HandleFunc("/api/logrotate/find", findLog)
+	http.HandleFunc("/api/logrotate/list", listLogFiles)
+	http.HandleFunc("/api/logrotate/open", openLog)
+	http.HandleFunc("/api/logrotate/download", download)
 	if config.Size > 0 {
 		config.splitFunc = config.splitBySize
 	} else {
