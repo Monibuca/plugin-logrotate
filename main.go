@@ -2,6 +2,7 @@ package logrotate
 
 import (
 	"bytes"
+	"embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,6 +17,10 @@ import (
 	. "github.com/Monibuca/engine/v2"
 	. "github.com/Monibuca/engine/v2/util"
 )
+
+//go:embed ui/*
+//go:embed README.md
+var ui embed.FS
 
 var config = new(LogRotate)
 
@@ -41,6 +46,7 @@ func init() {
 		Type:   PLUGIN_HOOK,
 		Config: config,
 		Run:    run,
+		UIFile: &ui,
 	})
 }
 func run() {
