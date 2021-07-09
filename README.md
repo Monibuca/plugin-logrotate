@@ -13,7 +13,9 @@ LogRotate
 Path = "log"
 Size = 0
 Days = 1
+Formatter = "2006-01-02T15"
 ```
 其中Path代表生成日志的目录
 Size代表按大小分割，单位是字节，如果为0，则按时间分割
 Days代表按时间分割，单位是天，即24小时
+Formatter日志文件名格式化，按照go layout格式化，默认按照小时

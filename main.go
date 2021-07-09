@@ -10,8 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
-	"time"
+    "time"
 
 	. "github.com/Monibuca/engine/v3"
 	. "github.com/Monibuca/utils/v3"
@@ -32,7 +31,7 @@ type LogRotate struct {
 	createTime  time.Time
 	hours       float64
 	splitFunc   func() bool
-	formatter   string
+	Formatter   string
 }
 
 func init() {
@@ -58,13 +57,11 @@ func run() {
 		config.splitFunc = config.splitByTime
 	}
 	config.createTime = time.Now()
-	if runtime.GOOS == "windows" {
-		config.formatter = "2006-01-02T15-04-05"
-	} else {
-		config.formatter = "2006-01-02T15:04:05"
-	}
+	if config.Formatter == "" {
+        config.Formatter = "2006-01-02T15"
+    }
 	err := os.MkdirAll(config.Path, 0777)
-	config.file, err = os.OpenFile(filepath.Join(config.Path, fmt.Sprintf("%s.log", config.createTime.Format(config.formatter))), os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0666)
+	config.file, err = os.OpenFile(filepath.Join(config.Path, fmt.Sprintf("%s.log", config.createTime.Format(config.Formatter))), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
 	if err == nil {
 		stat, _ := config.file.Stat()
 		config.currentSize = stat.Size()
@@ -85,7 +82,7 @@ func (l *LogRotate) Write(data []byte) (n int, err error) {
 	if err == nil {
 		if l.splitFunc() {
 			l.createTime = time.Now()
-			if file, err := os.OpenFile(filepath.Join(l.Path, fmt.Sprintf("%s.log", l.createTime.Format(config.formatter))), os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0666); err == nil {
+			if file, err := os.OpenFile(filepath.Join(l.Path, fmt.Sprintf("%s.log", l.createTime.Format(config.Formatter))), os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0666); err == nil {
 				l.file = file
 				l.currentSize = 0
 			}
