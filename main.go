@@ -35,11 +35,11 @@ type LogRotate struct {
 }
 
 func init() {
-	InstallPlugin(&PluginConfig{
+	pc := PluginConfig{
 		Name:   "LogRotate",
 		Config: &config,
-		Run:    run,
-	})
+	}
+	pc.Install(run)
 }
 func run() {
 	http.HandleFunc("/api/logrotate/tail", watchLogs)
@@ -58,7 +58,7 @@ func run() {
 	}
 	config.createTime = time.Now()
 	if config.Formatter == "" {
-        	config.Formatter = "2006-01-02T15"
+		config.Formatter = "2006-01-02T15"
 	}
 	err := os.MkdirAll(config.Path, 0777)
 	config.file, err = os.OpenFile(filepath.Join(config.Path, fmt.Sprintf("%s.log", config.createTime.Format(config.Formatter))), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
