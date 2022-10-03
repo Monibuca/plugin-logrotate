@@ -54,7 +54,7 @@ func (config *LogRotateConfig) OnEvent(event any) {
 		if config.Formatter == "" {
 			config.Formatter = "2006-01-02T15"
 		}
-		err := os.MkdirAll(config.Path, 0666)
+		err := os.MkdirAll(config.Path, 0766)
 		config.file, err = os.OpenFile(filepath.Join(config.Path, fmt.Sprintf("%s.log", config.createTime.Format(config.Formatter))), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
 		if err == nil {
 			stat, _ := config.file.Stat()
