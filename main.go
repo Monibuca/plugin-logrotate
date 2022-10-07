@@ -1,13 +1,11 @@
 package logrotate
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -86,77 +84,45 @@ func (l *LogRotateConfig) Write(data []byte) (n int, err error) {
 	}
 	return
 }
+
 func (l *LogRotateConfig) API_tail(w http.ResponseWriter, r *http.Request) {
 	writer := NewSSE(w, r.Context())
 	log.AddWriter(writer)
 	<-r.Context().Done()
 	log.DeleteWriter(writer)
 }
-func (l *LogRotateConfig) API_find(w http.ResponseWriter, r *http.Request) {
-	cmd := exec.Command("grep", fmt.Sprintf("\"%s\"", r.URL.Query().Get("query")), l.Path)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Run()
-	w.Write([]byte(out.String()))
-}
+
 func (l *LogRotateConfig) API_list(w http.ResponseWriter, r *http.Request) {
 	dir, err := os.Open(l.Path)
-	defer func() {
-		if err != nil {
-			w.Write([]byte(err.Error()))
+	if err == nil {
+		var files []os.FileInfo
+		if files, err = dir.Readdir(0); err == nil {
+			var fileInfos []*FileInfo
+			for _, info := range files {
+				fileInfos = append(fileInfos, &FileInfo{
+					info.Name(), info.Size(),
+				})
+			}
+			err = json.NewEncoder(w).Encode(fileInfos)
 		}
-	}()
+	}
 	if err != nil {
-		return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	var files []os.FileInfo
-	files, err = dir.Readdir(0)
-	if err != nil {
-		return
-	}
-	var fileInfos []*FileInfo
-	for _, info := range files {
-		fileInfos = append(fileInfos, &FileInfo{
-			info.Name(), info.Size(),
-		})
-	}
-	var bytes []byte
-	bytes, err = json.Marshal(fileInfos)
-	if err != nil {
-		return
-	}
-	w.Write(bytes)
 }
+
 func (l *LogRotateConfig) API_download(w http.ResponseWriter, r *http.Request) {
-	filename := r.URL.Query().Get("file")
-	file, err := os.Open(filepath.Join(l.Path, filename))
-	defer func() {
-		if err != nil {
-			w.Write([]byte(err.Error()))
-		}
-	}()
-	w.Header().Add("Content-Disposition", "attachment; filename="+filename)
-	if err != nil {
-		return
-	}
-	_, err = io.Copy(w, file)
-	if err != nil {
-		return
-	}
+	w.Header().Add("Content-Disposition", "attachment; filename="+r.URL.Query().Get("file"))
+	l.API_open(w, r)
 }
+
 func (l *LogRotateConfig) API_open(w http.ResponseWriter, r *http.Request) {
-	filename := r.URL.Query().Get("file")
-	file, err := os.Open(filepath.Join(l.Path, filename))
-	defer func() {
-		if err != nil {
-			w.Write([]byte(err.Error()))
-		}
-	}()
-	if err != nil {
-		return
+	file, err := os.Open(filepath.Join(l.Path, r.URL.Query().Get("file")))
+	defer file.Close()
+	if err == nil {
+		_, err = io.Copy(w, file)
 	}
-	_, err = io.Copy(w, file)
 	if err != nil {
-		return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
