@@ -11,6 +11,7 @@ import (
 
 	. "m7s.live/engine/v4"
 	"m7s.live/engine/v4/log"
+	"m7s.live/engine/v4/util"
 	. "m7s.live/engine/v4/util"
 )
 
@@ -117,7 +118,12 @@ func (l *LogRotateConfig) API_download(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *LogRotateConfig) API_open(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open(filepath.Join(l.Path, r.URL.Query().Get("file")))
+	path := filepath.Join(l.Path, r.URL.Query().Get("file"))
+	if !util.IsSubdir(l.Path, path) {
+		http.Error(w, "invalid file", http.StatusBadRequest)
+		return
+	}
+	file, err := os.Open(path)
 	defer file.Close()
 	if err == nil {
 		_, err = io.Copy(w, file)
