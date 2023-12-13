@@ -20,10 +20,10 @@ type FileInfo struct {
 	Size int64
 }
 type LogRotateConfig struct {
-	Path        string
-	Size        int64
-	Days        int
-	Formatter   string
+	Path        string `default:"./logs" desc:"日志文件存放目录"`
+	Size        int64  `desc:"日志文件大小，单位：字节"`
+	Days        int    `default:"1" desc:"日志文件保留天数"`
+	Formatter   string `default:"2006-01-02T15" desc:"日志文件名格式"`
 	file        *os.File
 	currentSize int64
 	createTime  time.Time
@@ -31,11 +31,7 @@ type LogRotateConfig struct {
 	splitFunc   func() bool
 }
 
-var plugin = InstallPlugin(&LogRotateConfig{
-	Path:      "./logs",
-	Days:      1,
-	Formatter: "2006-01-02T15",
-})
+var _ = InstallPlugin(&LogRotateConfig{})
 
 func (config *LogRotateConfig) OnEvent(event any) {
 	switch event.(type) {
@@ -108,7 +104,9 @@ func (l *LogRotateConfig) API_list(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ReturnError(APIErrorOpen, err.Error(), w, r)
+	} else {
+		ReturnOK(w, r)
 	}
 }
 
@@ -124,11 +122,13 @@ func (l *LogRotateConfig) API_open(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	file, err := os.Open(path)
-	defer file.Close()
 	if err == nil {
+		defer file.Close()
 		_, err = io.Copy(w, file)
 	}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ReturnError(APIErrorOpen, err.Error(), w, r)
+	} else {
+		ReturnOK(w, r)
 	}
 }
