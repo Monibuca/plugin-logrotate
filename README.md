@@ -22,8 +22,14 @@ logrotate:
 ```
 ## API接口
 
-- `logrotate/api/tail` 监听日志输出，该请求是一个SSE（server-sent Event）
-- `logrotate/api/find` 查找日志，目前只支持linux系统（使用grep）
-- `logrotate/api/list` 列出所有日志文件
-- `logrotate/api/open?file=xxx` 查看日志内容，入参是文件名
-- `logrotate/api/download?file=xxx` 下载某个日志，入参是文件名
+### GET `logrotate/api/tail`
+监听日志输出，该请求是一个SSE（server-sent Event）
+
+### GET `logrotate/api/find` 
+查找日志，目前只支持linux系统（使用grep），参数为 `?query=xxx`，比如 `/logrotate/api/find?query=monibuca`
+### GET `logrotate/api/list` 
+日志列表，列出所有日志文件
+### GET `logrotate/api/open` 
+打开日志，入参是 `?file=xxx`， `xxx`为文件名，文件名来自日志列表中的文件，比如 `logrotate/api/open?file=2024-01-23T09.log` 
+### GET `logrotate/api/download` 
+下载某个日志，入参是`?file=xxx`，参数同上打开日志
