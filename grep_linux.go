@@ -7,7 +7,12 @@ import (
 )
 
 func (l *LogRotateConfig) API_find(w http.ResponseWriter, r *http.Request) {
-	cmd := exec.Command("grep", fmt.Sprintf("\"%s\"", r.URL.Query().Get("query")), l.Path)
+	query := r.URL.Query().Get("query")
+	if query == "" {
+		w.Write([]byte("query is empty"))
+		return
+	}
+	cmd := exec.Command("grep", "-r",  query, l.Path)
 	cmd.Stdout = w
 	cmd.Stderr = w
 	cmd.Run()
