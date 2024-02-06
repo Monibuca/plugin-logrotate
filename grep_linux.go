@@ -1,7 +1,6 @@
 package logrotate
 
 import (
-	"fmt"
 	"net/http"
 	"os/exec"
 )
